@@ -1,0 +1,46 @@
+const ICardType = {
+    "s":"Spades",
+    "d":"Diamonds",
+    "h":"Hearts",
+    "c":"Clubs"
+};
+
+const ICardNumber = {
+    "1" :"A",
+    "2":"2",
+    "3":"3",
+    "4":"4",
+    "5":"5",
+    "6":"6",
+    "7":"7",
+    "8":"8",
+    "9":"9",
+    "10":"10",
+    "11":"J",
+    "12":"Q",
+    "13":"K"
+}
+
+var Card = cc.Sprite.extend({
+
+    ctor: function (cardName) {
+        let cardType = cardName.substr(cardName.length-1,cardName.length);
+        let cardNumber = cardName.substr(0,cardName.length-1);
+        let card = `../../res/graphics/cards/card${ICardType[cardType]}${ICardNumber[cardNumber]}.png`
+        this._super(card);
+        return true;
+    },
+
+    removeListener(
+        node=this,
+        recursive= false
+      ) {
+        try {
+          recursive = recursive || false;
+          cc.eventManager.removeListeners(node, recursive);
+        } catch (err) {
+          cc.error("Error while removing removeEventListenerFromNode:" + err);
+        }
+      },
+
+})
