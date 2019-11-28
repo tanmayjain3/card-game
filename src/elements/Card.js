@@ -28,19 +28,8 @@ var Card = cc.Sprite.extend({
         let cardNumber = cardName.substr(0,cardName.length-1);
         let card = `../../res/graphics/cards/card${ICardType[cardType]}${ICardNumber[cardNumber]}.png`
         this._super(card);
+        this.setAnchorPoint(0.5,0.5);
         return true;
-    },
-
-    removeListener(
-        node=this,
-        recursive= false
-      ) {
-        try {
-          recursive = recursive || false;
-          cc.eventManager.removeListeners(node, recursive);
-        } catch (err) {
-          cc.error("Error while removing removeEventListenerFromNode:" + err);
-        }
-      },
+    }
 
 })
