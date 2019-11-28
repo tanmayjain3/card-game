@@ -4,5 +4,6 @@ var jsList = [
     "src/elements/Card.js",
     "src/scene/GameScene.js",
     "src/Game.js",
+    "src/Sound.js",
     "src/helpers/EventHelper.js"
 ]
