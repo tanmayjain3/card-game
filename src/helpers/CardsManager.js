@@ -4,9 +4,10 @@ var CardManager = cc.Class.extend({
     cardArray:null,
     _eventHelper:null,
     selectedArray:null,
+
     ctor:function(gamescene){
         this.cardArray = [];
-        this.selectedArray=[];
+        this.selectedArray = [];
         this._cardContainer =gamescene;
         this._eventHelper = new EventHelper();
     },
@@ -24,33 +25,41 @@ var CardManager = cc.Class.extend({
 
     addListenersOnCards:function(){
         for(let i =0;i<this.cardArray.length;i++){
-            this._eventHelper.addMouseTouchEvent(this._cardContainer.handleTouch.bind(this._cardContainer),this.cardArray[i], false);
+            this._eventHelper.addMouseTouchEvent(this._cardContainer.handleTouch.bind(this._cardContainer),this.cardArray[i], cc.sys.isMobile?true:false);
         }
     },
 
     removeListenerFromAllCards(){
         for(let i =0;i<this.cardArray.length;i++){
-            if(!this.cardArray[i].isSelected){
                 this._eventHelper.removeEventListenerFromNode(this.cardArray[i])
-            }
         }
       },
 
 
-    setPositionOfCards(){
+    setPositionOfCards(setZIndex=false){
         this.cardArray.sort(function(a,b){
           return a.zIndex - b.zIndex})
       this.cardArray.forEach((card,i)=>{
         card.x = 2*GameConstants.CARD_WIDTH + i*(GameConstants.CARD_WIDTH/4) 
         card.y = cc.winSize.height/2
-        card.zIndex = i;
+        card.stopAllActions();
+        if(setZIndex){
+            card.zIndex = i;
+        }
       })
     },
+
     playSelectedCardAnimation:function(){
         if(this.selectedArray.length){
             this.selectedArray.forEach((card)=>{
                 card.flickAnimation();
             })
         }
+    },
+
+    reset:function(){
+        this.cardArray = this.cardArray.concat(this.selectedArray);
+        this.selectedArray = [];
+        this.setPositionOfCards();
     }
 })
