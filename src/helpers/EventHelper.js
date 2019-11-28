@@ -1,15 +1,10 @@
 const EventHelperStates = {
-    NAME : "EventHelper",
     ON_MOUSE_BEGAN : "onMouseBegan",
-    ON_KB_BEGAN : "onKbBegan",
     ON_MOUSE_MOVE : "onMouseMove",
     ON_MOUSE_END : "onMouseEnd",
-    ON_KB_END : "onKbEnd",
     ON_MOUSE_CANCEL : "onMouseCancel",
-    ON_KB_CANCEL : "onKbCancel",
     ON_MOUSE_OUT : "onMouseOut",
     ON_MOUSE_OVER : "onMouseOver",
-    ON_SCROLL : "onScroll",
     ON_CLICK : "onClick",
     ON_SWIPE_LEFT : "onSwipeLeft",
     ON_SWIPE_RIGHT : "onSwipeRight",
@@ -115,7 +110,6 @@ var EventHelper = cc.Class.extend({
                   (cc.rectContainsPoint(rect, locationInNode) || noCheck)) ||
                 (eventFilter && eventFilter(event, locationInNode))
               ) {
-                // sending callback for touch end
                 let timeTaken = Date.now() - target.startTime;
                 if (
                   Math.abs(target.startX - touch.getLocation().x) <
@@ -130,7 +124,6 @@ var EventHelper = cc.Class.extend({
                 }
     
                 let currentSwipe = null;
-                // // check the
                 let leftSwipeDifference =
                   target.startX - touch.getLocation().x;
                 let rightSwipeDifference =
@@ -409,8 +402,6 @@ var EventHelper = cc.Class.extend({
               ) {
                 let result = true;
                 if (callBack) {
-                  // change: 06/02/2019.
-                  // checking if mouse was inside before
                   if (currentTarget.insideFlag) {
                     result = callBack(event, touch, EventHelperStates.ON_MOUSE_OUT);
                   }

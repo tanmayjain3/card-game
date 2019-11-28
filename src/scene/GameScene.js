@@ -4,7 +4,6 @@ var GameScene = cc.Scene.extend({
     initialPos:null,
     group:null,
     reset:null,
-    cardSelected:null,
     selectedCard :null,
     delatX:null,
     _eventHelper:null,
@@ -14,19 +13,23 @@ var GameScene = cc.Scene.extend({
     ctor: function (data) {
       this._super();
         Sound.playGameBgMusic();
-        this.addBackground();
-        this._eventHelper = new EventHelper();
-        this._cardManager = new CardManager(this);
-        this._cardManager.init(data.value.cards);
-        this.addButton("group")
-        this.addButton("reset")
-        this._cardManager.setPositionOfCards();
-        this._cardManager.addListenersOnCards();
+        this.init(data);
         return true;
     },
 
+    init:function(data){
+      this.addBackground();
+      this._eventHelper = new EventHelper();
+      this._cardManager = new CardManager(this);
+      this._cardManager.init(data.value.cards);
+      this.addButton(GameConstants.GROUP)
+      this.addButton(GameConstants.RESET)
+      this._cardManager.setPositionOfCards();
+      this._cardManager.addListenersOnCards();
+    },
+
     addBackground:function(){
-        let background = new cc.Sprite("../../res/graphics/background.png");
+        let background = new cc.Sprite(GameConstants.BACKGROUND_PATH);
         background.setPosition(cc.winSize.width/2, cc.winSize.height/2);
         background.setAnchorPoint(0.5,0.5);
         this.addChild(background,-2);
@@ -93,15 +96,9 @@ var GameScene = cc.Scene.extend({
     },
 
     addButton:function(name){
-      this[name] =  new cc.Sprite("../../res/graphics/button.png");
-      this[name].setAnchorPoint(0.5,0);
-      this[name].setPosition(name=="group"?
+      this[name] =  new Button(GameConstants.BUTTON_PATH,name);
+      this[name].setPosition(name==GameConstants.GROUP?
       cc.winSize.width/2 - cc.winSize.width/4:cc.winSize.width/2 + cc.winSize.width/4,0);
-      var fnt = "res/fonts/font.fnt";
-      var buttonText = new cc.LabelTTF(name.toUpperCase(), fnt, 40);
-      this[name].addChild(buttonText, 100);
-      buttonText.setAnchorPoint(0.5,0);
-      buttonText.setPosition(100,40);
       this.addChild(this[name], 50);
       this[name].visible = false;
     },

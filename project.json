@@ -13,6 +13,7 @@
     "jsList" : [
         "src/GameConstants.js",
         "src/elements/Card.js",
+        "src/elements/Button.js",
         "src/scene/GameScene.js",
         "src/Game.js",
         "src/Sound.js",
