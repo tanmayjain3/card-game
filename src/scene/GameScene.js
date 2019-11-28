@@ -8,6 +8,7 @@ var GameScene = cc.Scene.extend({
     delatX:null,
     _eventHelper:null,
     _cardManager:null,
+    _move:false,
 
 
     ctor: function (data) {
@@ -46,6 +47,7 @@ var GameScene = cc.Scene.extend({
                 break;
             }
             case EventHelperStates.ON_MOUSE_MOVE:{
+              this._move = true;
                 let target =event.getCurrentTarget();
                 if(target ==this.selectedCard ||cc.sys.isMobile){
                   this.delatX = touch.getLocation().x - target.getPosition().x
@@ -60,16 +62,17 @@ var GameScene = cc.Scene.extend({
             case EventHelperStates.ON_MOUSE_END:{
               if(!cc.sys.isMobile){
                 let target = event.getCurrentTarget();
-                  if(target.getPosition().x==this.initialPos.x &&target.getPosition().y==this.initialPos.y){
+                  if(target.getPosition().x==this.initialPos.x){
                     Sound.playCardClick();
                     this.handleSelectedCard(target);
                   } else{
-                    if(this.selectedCard){
+                    if(this.selectedCard && this._move){
                       this._cardManager.cardArray.push(this.selectedCard);
                       this._cardManager.setPositionOfCards(true);
                     }
                   }
                 this.selectedCard = null;
+                this._move = false;
                 break;
               }
             }
@@ -85,7 +88,7 @@ var GameScene = cc.Scene.extend({
               break;
             }
             case EventHelperStates.ON_CLICK:{
-              if(cc.sys.isMobile){
+              if(cc.sys.isMobile && this._move){
                 let target = event.getCurrentTarget();
                 Sound.playCardClick();
                 this.handleSelectedCard(target);
