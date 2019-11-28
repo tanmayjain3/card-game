@@ -32,9 +32,10 @@ var Card = cc.Sprite.extend({
         return true;
     },
 
-    flickAnimation:function(){
-        let moveUp = cc.moveBy(.3,0,10);
-        let moveDown = cc.moveBy(.3,0,-10);
+    flickAnimation:function(random=false){
+        let deltaY = random?3+Math.floor(Math.random()*10):10;
+        let moveUp = cc.moveBy(.3,0,deltaY);
+        let moveDown = cc.moveBy(.3,0,-deltaY);
         this.runAction(cc.sequence([moveUp,moveDown]).repeatForever());
     }
 

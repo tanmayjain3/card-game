@@ -53,6 +53,7 @@ var GameScene = cc.Scene.extend({
                   if(this._cardManager.cardArray.indexOf(this.selectedCard)>=0){
                     this._cardManager.cardArray.splice(this._cardManager.cardArray.indexOf(this.selectedCard),1);
                   }
+                  this._cardManager.playCardAnimation();
                 }
                 break;
             }

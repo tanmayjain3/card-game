@@ -4,11 +4,13 @@ var CardManager = cc.Class.extend({
     cardArray:null,
     _eventHelper:null,
     selectedArray:null,
+    _animationStarted:null,
 
     ctor:function(gamescene){
         this.cardArray = [];
         this.selectedArray = [];
         this._cardContainer =gamescene;
+        this._animationStarted = false;
         this._eventHelper = new EventHelper();
     },
 
@@ -37,6 +39,7 @@ var CardManager = cc.Class.extend({
 
 
     setPositionOfCards(setZIndex=false){
+        this._animationStarted = false;
         this.cardArray.sort(function(a,b){
           return a.zIndex - b.zIndex})
       this.cardArray.forEach((card,i)=>{
@@ -53,6 +56,15 @@ var CardManager = cc.Class.extend({
         if(this.selectedArray.length){
             this.selectedArray.forEach((card)=>{
                 card.flickAnimation();
+            })
+        }
+    },
+
+    playCardAnimation:function(){
+        if(this.cardArray.length && !this._animationStarted){
+            this._animationStarted = true;
+            this.cardArray.forEach((card)=>{
+                card.flickAnimation(true);
             })
         }
     },
