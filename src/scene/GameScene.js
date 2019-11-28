@@ -24,6 +24,7 @@ var GameScene = cc.Scene.extend({
 
     ctor: function (data) {
         this._super();
+        Sound.playGameBgMusic();
         this.cardArray = [];
         this.selectedArray = [];
         this.buttonClicked = 0;
@@ -507,6 +508,7 @@ var GameScene = cc.Scene.extend({
             case EventHelper.ON_MOUSE_END:{
                 let target = event.getCurrentTarget();
                   if(target.getPosition().x==this.initialPos.x &&target.getPosition().y==this.initialPos.y){
+                    Sound.playCardClick();
                     this.handleSelectedCard(target);
                   } else{
                     if(this.selectedCard){
@@ -531,6 +533,7 @@ var GameScene = cc.Scene.extend({
                   target.x -=20;
                 }
               }
+              break;
             }
             default:break;
         }
@@ -580,6 +583,7 @@ var GameScene = cc.Scene.extend({
       handleGroupButtonClick(touch ,event ,type){
         switch(type){
           case EventHelper.ON_CLICK:{
+            Sound.playGroup();
             if(this.selectedArray.length){
               // this.buttonClicked++;
               let target = touch._currentTarget;
@@ -609,7 +613,7 @@ var GameScene = cc.Scene.extend({
       },
 
       handleSelectedCard(card){
-        if(this.cardArray.indexOf(card)>0){
+        if(this.cardArray.indexOf(card)>=0){
           card.y +=card.height/2;
           this.cardArray.splice(this.cardArray.indexOf(card),1);
           this.selectedArray.push(card);
@@ -642,6 +646,7 @@ var GameScene = cc.Scene.extend({
       handleResetButtonClick(touch, event, type){
         switch(type){
           case EventHelper.ON_CLICK:{
+            Sound.playReset()
             let target = touch._currentTarget;
             target.setScale(1);
             this.cardArray=this.cardArray.concat(this.selectedArray);
@@ -670,7 +675,7 @@ var GameScene = cc.Scene.extend({
             return a.zIndex - b.zIndex})
         }
         this.cardArray.forEach((card,i)=>{
-          card.x = CARD_WIDTH + i*(CARD_WIDTH/4) 
+          card.x = 2*CARD_WIDTH + i*(CARD_WIDTH/4) 
           card.y = cc.winSize.height/2
           card.zIndex = i;
         })

@@ -15,5 +15,9 @@ var Sound = {
     playReset:function(){
         if(!Sound.silence)
             cc.audioEngine.playEffect("res/sounds/reset.mp3", false);
+    },
+    playCardClick:function(){
+        if(!Sound.silence)
+            cc.audioEngine.playEffect("res/sounds/cardClick.mp3", false);
     }
 };
