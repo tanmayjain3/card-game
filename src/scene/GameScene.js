@@ -4,7 +4,6 @@ var GameScene = cc.Scene.extend({
     initialPos:null,
     group:null,
     reset:null,
-    selectedArray:null,
     cardSelected:null,
     selectedCard :null,
     delatX:null,
@@ -15,21 +14,20 @@ var GameScene = cc.Scene.extend({
     ctor: function (data) {
       this._super();
         Sound.playGameBgMusic();
-        this.selectedArray = [];
         this.cardSelected = false;
-        this.addBackGround();
+        this.addBackground();
         this._eventHelper = new EventHelper();
         this._cardManager = new CardManager(this);
-                let cards = data.value.cards;
-                this._cardManager.init(cards);
-                this.addButton("group")
-                this.addButton("reset")
-                this._cardManager.setPositionOfCards();
-                this._cardManager.addListenersOnCards();
+        let cards = data.value.cards;
+        this._cardManager.init(cards);
+        this.addButton("group")
+        this.addButton("reset")
+        this._cardManager.setPositionOfCards();
+        this._cardManager.addListenersOnCards();
         return true;
     },
 
-    addBackGround:function(){
+    addBackground:function(){
         let background = new cc.Sprite("../../res/graphics/background.png");
         background.setPosition(cc.winSize.width/2, cc.winSize.height/2);
         background.setAnchorPoint(0.5,0.5);
@@ -111,16 +109,15 @@ var GameScene = cc.Scene.extend({
         switch(type){
           case EventHelperStates.ON_CLICK:{
             Sound.playGroup();
-            if(this.selectedArray.length){
+            if(this._cardManager.selectedArray.length){
               let target = touch._currentTarget;
               target.setScale(1);
-                this.selectedArray.forEach((card,i) => {
+                this._cardManager.selectedArray.forEach((card,i) => {
+                  card.stopAllActions();
                     card.x = cc.winSize.width - GameConstants.CARD_WIDTH -i*GameConstants.CARD_WIDTH/4;
-                    card.y -=card.height/2;
+                    card.y =cc.winSize.height/2;
                 });
-                this._cardManager.cardArray.forEach((card,i)=>{
-                  card.x = GameConstants.CARD_WIDTH +i*GameConstants.CARD_WIDTH/4;
-                })
+                this._cardManager.setPositionOfCards();
                 this._eventHelper.removeEventListenerFromNode(this.group);
             }
             break;
@@ -142,17 +139,19 @@ var GameScene = cc.Scene.extend({
         if(this._cardManager.cardArray.indexOf(card)>=0){
           card.y +=card.height/2;
           this._cardManager.cardArray.splice(this._cardManager.cardArray.indexOf(card),1);
-          this.selectedArray.push(card);
+          this._cardManager.selectedArray.push(card);
         } else {
-          card.y -=card.height/2;
-          this.selectedArray.splice(this.selectedArray.indexOf(card),1);
+          card.stopAllActions();
+          card.y =cc.winSize.height/2;
+          this._cardManager.selectedArray.splice(this._cardManager.selectedArray.indexOf(card),1);
           this._cardManager.cardArray.push(card);
         }
-        if(this.selectedArray.length>0){
+        if(this._cardManager.selectedArray.length>0){
           this.addListenersAndMakeButtonsVisible();
         } else{
           this.removeListenersAndHideButtons();
         }
+        this._cardManager.playSelectedCardAnimation();
       },
 
       addListenersAndMakeButtonsVisible(){
@@ -175,8 +174,8 @@ var GameScene = cc.Scene.extend({
             Sound.playReset()
             let target = touch._currentTarget;
             target.setScale(1);
-            this._cardManager.cardArray=this._cardManager.cardArray.concat(this.selectedArray);
-            this.selectedArray = [];
+            this._cardManager.cardArray=this._cardManager.cardArray.concat(this._cardManager.selectedArray);
+            this._cardManager.selectedArray = [];
             this._cardManager.setPositionOfCards();
             this.removeListenersAndHideButtons();
             break;

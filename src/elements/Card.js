@@ -30,6 +30,12 @@ var Card = cc.Sprite.extend({
         this._super(card);
         this.setAnchorPoint(0.5,0.5);
         return true;
+    },
+
+    flickAnimation:function(){
+        let moveUp = cc.moveBy(.3,0,10);
+        let moveDown = cc.moveBy(.3,0,-10);
+        this.runAction(cc.sequence([moveUp,moveDown]).repeatForever());
     }
 
 })
