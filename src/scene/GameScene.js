@@ -11,17 +11,24 @@ var GameScene = cc.Scene.extend({
     tempZIndex:null,
     cardArry:null,
     initialPos:null,
-    split:null,
+    group:null,
     reset:null,
     resetButton:null,
     selectedArray:null,
     buttonClicked:null,
+    cardSelected:null,
+    tempPost:null,
+    selectedCard :null,
+    delatX:null,
+
 
     ctor: function (data) {
         this._super();
         this.cardArray = [];
         this.selectedArray = [];
         this.buttonClicked = 0;
+        this.cardSelected = false;
+        this.tempZIndex = 0;
         this._ui = new GameSceneUI();
         this.addChild(this._ui);
         this.cardsInfo=data;
@@ -31,10 +38,10 @@ var GameScene = cc.Scene.extend({
                     cardMc.setAnchorPoint(0.5,0.5);
                     cardMc.setContentSize(cc.size(CARD_WIDTH,CARD_HEIGHT));
                     this._ui.addChild(cardMc,i);
-                    this.cardArray.push(cardMc);
+                    this.cardArray.push(cardMc,);
                 }
                 this.setPositionOfCards();
-                this.addButton("split");
+                this.addButton("group");
                 this.addButton("reset");
                 this.addListenersOnCards();
         return true;
@@ -475,37 +482,55 @@ var GameScene = cc.Scene.extend({
         // console.log(type);
         switch(type){
             case EventHelper.ON_MOUSE_BEGAN:{
+              if(!this.cardSelected){
                 let target = event.getCurrentTarget();
-                if(this.tempZIndex==null){
-                    this.tempZIndex = target.zIndex;
-                }
                 this.initialPos = target.getPosition();
-                target.zIndex = 100;
                 target["isSelected"] = true;
-                this.removeListenerFromallCards();
+                this.cardSelected = true; 
+                this.selectedCard = target;
+                // this.removeListenerFromallCards();
+              }
                 break;
             }
             case EventHelper.ON_MOUSE_MOVE:{
                 let target =event.getCurrentTarget();
-                target.setPosition(touch.getLocation());
+                if(target.isSelected){
+                  this.delatX = touch.getLocation().x - target.getPosition().x
+                  target.setPosition(touch.getLocation());
+                  if(this.cardArray.indexOf(this.selectedCard)>=0){
+                    this.cardArray.splice(this.cardArray.indexOf(this.selectedCard),1);
+                  }
+                }
+
                 break;
             }
             case EventHelper.ON_MOUSE_END:{
                 let target = event.getCurrentTarget();
-                target.zIndex = this.tempZIndex;
-                this.tempZIndex = null;
+                  if(target.getPosition().x==this.initialPos.x &&target.getPosition().y==this.initialPos.y){
+                    this.handleSelectedCard(target);
+                  } else{
+                    if(this.selectedCard){
+                      this.cardArray.push(this.selectedCard);
+                      this.setPositionOfCards(true);
+                    }
+                  }
+                this.cardSelected = false; 
+                this.selectedCard = null;
                 target["isSelected"] = false;
-                if(target.getPosition().x==this.initialPos.x &&target.getPosition().y==this.initialPos.y){
-                  this.handleSelectedCard(target);
-                } else{
-                  target.setPosition(this.initialPos);
-                }
-                target.removeListener();
-                this.addListenersOnCards();
                 break;
             }
-            case EventHelper.ON_MOUSE_OUT:{
-              break;
+            case EventHelper.ON_MOUSE_OVER:{
+              let target = event._currentTarget;
+              if(target && this.selectedCard){
+                this.tempPost =target.getPosition();
+                if(this.delatX<0){
+                  target.x +=20;
+                  this.selectedCard.zIndex = target.zIndex +1;
+                } else{
+                  this.selectedCard.zIndex = target.zIndex
+                  target.x -=20;
+                }
+              }
             }
             default:break;
         }
@@ -513,7 +538,7 @@ var GameScene = cc.Scene.extend({
 
     addListenersOnCards(){
         for(let i =0;i<this.cardArray.length;i++){
-            this.addMouseTouchEvent(this.handleTouch.bind(this),this.cardArray[i]);
+            this.addMouseTouchEvent(this.handleTouch.bind(this),this.cardArray[i], false);
         }
     },
 
@@ -541,7 +566,7 @@ var GameScene = cc.Scene.extend({
       addButton(name){
         this[name] =  new cc.Sprite("../../res/graphics/button.png");
         this[name].setAnchorPoint(0.5,0);
-        this[name].setPosition(name=="split"?
+        this[name].setPosition(name=="group"?
         cc.winSize.width/2 - cc.winSize.width/4:cc.winSize.width/2 + cc.winSize.width/4,0);
         var fnt = "res/fonts/font.fnt";
         var buttonText = new cc.LabelTTF(name.toUpperCase(), fnt, 40);
@@ -549,11 +574,11 @@ var GameScene = cc.Scene.extend({
         buttonText.setAnchorPoint(0.5,0);
         buttonText.setPosition(100,40);
         this.addChild(this[name], 50);
-        this.addMouseTouchEvent(name=="split"?
-        this.handleSplitButtonClick.bind(this):this.handleResetButtonClick.bind(this), this[name]);
+        this.addMouseTouchEvent(name=="group"?
+        this.handleGroupButtonClick.bind(this):this.handleResetButtonClick.bind(this), this[name]);
       },
 
-      handleSplitButtonClick(touch ,event ,type){
+      handleGroupButtonClick(touch ,event ,type){
         switch(type){
           case EventHelper.ON_CLICK:{
             if(this.selectedArray.length){
@@ -567,8 +592,8 @@ var GameScene = cc.Scene.extend({
                 this.cardArray.forEach((card,i)=>{
                   card.x = CARD_WIDTH +i*CARD_WIDTH/4;
                 })
+                this.removeEventListenerFromNode(this.group);
             }
-            this.removeEventListenerFromNode(this.split);
             break;
           }
           case EventHelper.ON_MOUSE_OVER:{
@@ -585,20 +610,25 @@ var GameScene = cc.Scene.extend({
       },
 
       handleSelectedCard(card){
+        if(this.cardArray.indexOf(card)>0){
           card.y +=card.height/2;
           this.cardArray.splice(this.cardArray.indexOf(card),1);
           this.selectedArray.push(card);
+        } else if(this.selectedArray.indexOf(card)>0){
+          card.y -=card.height/2;
+          this.selectedArray.splice(this.selectedArray.indexOf(card),1);
+          this.cardArray.push(card);
+        }
       },
 
       handleResetButtonClick(touch, event, type){
         switch(type){
           case EventHelper.ON_CLICK:{
             this.cardArray=this.cardArray.concat(this.selectedArray);
-            this.cardArray.sort(function(a,b){return a.zIndex-b.zIndex })
             this.selectedArray = [];
             this.buttonClicked = 0;
-            this.setPositionOfCards();
-            this.addMouseTouchEvent(this.handleSplitButtonClick.bind(this), this.split);
+            this.setPositionOfCards(true);
+            this.addMouseTouchEvent(this.handleGroupButtonClick.bind(this), this.group);
             break;
           }
           case EventHelper.ON_MOUSE_OVER:{
@@ -614,7 +644,11 @@ var GameScene = cc.Scene.extend({
         }
       },
 
-      setPositionOfCards(){
+      setPositionOfCards(sort=false){
+        if(sort){
+          this.cardArray.sort(function(a,b){
+            return a.zIndex - b.zIndex})
+        }
         this.cardArray.forEach((card,i)=>{
           card.x = CARD_WIDTH + i*(CARD_WIDTH/4) 
           card.y = cc.winSize.height/2
