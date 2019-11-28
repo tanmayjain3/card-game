@@ -69,13 +69,13 @@ var GameScene = cc.Scene.extend({
                     if(this.selectedCard && this._move){
                       this._cardManager.cardArray.push(this.selectedCard);
                       this._cardManager.setPositionOfCards(true);
-                    }
                   }
                 this.selectedCard = null;
                 this._move = false;
                 break;
               }
             }
+          }
             case EventHelperStates.ON_MOUSE_OVER:{
               let target = event._currentTarget;
               if(target && this.selectedCard){
