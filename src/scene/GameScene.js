@@ -40,9 +40,9 @@ var GameScene = cc.Scene.extend({
                     this._ui.addChild(cardMc,i);
                     this.cardArray.push(cardMc,);
                 }
+                this.addButton("group")
+                this.addButton("reset")
                 this.setPositionOfCards();
-                this.addButton("group");
-                this.addButton("reset");
                 this.addListenersOnCards();
         return true;
     },
@@ -574,8 +574,7 @@ var GameScene = cc.Scene.extend({
         buttonText.setAnchorPoint(0.5,0);
         buttonText.setPosition(100,40);
         this.addChild(this[name], 50);
-        this.addMouseTouchEvent(name=="group"?
-        this.handleGroupButtonClick.bind(this):this.handleResetButtonClick.bind(this), this[name]);
+        this[name].visible = false;
       },
 
       handleGroupButtonClick(touch ,event ,type){
@@ -614,21 +613,42 @@ var GameScene = cc.Scene.extend({
           card.y +=card.height/2;
           this.cardArray.splice(this.cardArray.indexOf(card),1);
           this.selectedArray.push(card);
-        } else if(this.selectedArray.indexOf(card)>0){
+        } else {
           card.y -=card.height/2;
           this.selectedArray.splice(this.selectedArray.indexOf(card),1);
           this.cardArray.push(card);
         }
+        if(this.selectedArray.length>0){
+          this.addListenersAndMakeButtonsVisible();
+        } else{
+          this.removeListenersAndHideButtons();
+        }
+      },
+
+      addListenersAndMakeButtonsVisible(){
+        this.reset.visible = true;
+        this.group.visible = true;
+        this.addMouseTouchEvent(this.handleResetButtonClick.bind(this),this.reset);
+        this.addMouseTouchEvent(this.handleGroupButtonClick.bind(this),this.group);
+      },
+
+      removeListenersAndHideButtons(){
+        this.reset.visible = false;
+        this.group.visible = false;
+        this.removeEventListenerFromNode(this.reset);
+        this.removeEventListenerFromNode(this.group);        
       },
 
       handleResetButtonClick(touch, event, type){
         switch(type){
           case EventHelper.ON_CLICK:{
+            let target = touch._currentTarget;
+            target.setScale(1);
             this.cardArray=this.cardArray.concat(this.selectedArray);
             this.selectedArray = [];
             this.buttonClicked = 0;
             this.setPositionOfCards(true);
-            this.addMouseTouchEvent(this.handleGroupButtonClick.bind(this), this.group);
+            this.removeListenersAndHideButtons();
             break;
           }
           case EventHelper.ON_MOUSE_OVER:{
