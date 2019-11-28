@@ -1,8 +1,6 @@
  
 var GameScene = cc.Scene.extend({
 
-    _ui: null,
-    cardArry:null,
     initialPos:null,
     group:null,
     reset:null,
@@ -11,30 +9,23 @@ var GameScene = cc.Scene.extend({
     selectedCard :null,
     delatX:null,
     _eventHelper:null,
+    _cardManager:null,
 
 
     ctor: function (data) {
       this._super();
         Sound.playGameBgMusic();
-        this.cardArray = [];
         this.selectedArray = [];
         this.cardSelected = false;
-        this._ui = new GameSceneUI();
         this.addBackGround();
         this._eventHelper = new EventHelper();
-        this.addChild(this._ui);
+        this._cardManager = new CardManager(this);
                 let cards = data.value.cards;
-                for(let i=0;i<cards.length;i++){
-                    var cardMc = new Card(cards[i])
-                    cardMc.setAnchorPoint(0.5,0.5);
-                    cardMc.setContentSize(cc.size(GameConstants.CARD_WIDTH,GameConstants.CARD_HEIGHT));
-                    this._ui.addChild(cardMc,i);
-                    this.cardArray.push(cardMc,);
-                }
+                this._cardManager.init(cards);
                 this.addButton("group")
                 this.addButton("reset")
-                this.setPositionOfCards();
-                this.addListenersOnCards();
+                this._cardManager.setPositionOfCards();
+                this._cardManager.addListenersOnCards();
         return true;
     },
 
@@ -42,7 +33,7 @@ var GameScene = cc.Scene.extend({
         let background = new cc.Sprite("../../res/graphics/background.png");
         background.setPosition(cc.winSize.width/2, cc.winSize.height/2);
         background.setAnchorPoint(0.5,0.5);
-        this._ui.addChild(background);
+        this.addChild(background);
     },
 
     handleTouch:function(event , touch ,type){
@@ -62,8 +53,8 @@ var GameScene = cc.Scene.extend({
                 if(target.isSelected){
                   this.delatX = touch.getLocation().x - target.getPosition().x
                   target.setPosition(touch.getLocation());
-                  if(this.cardArray.indexOf(this.selectedCard)>=0){
-                    this.cardArray.splice(this.cardArray.indexOf(this.selectedCard),1);
+                  if(this._cardManager.cardArray.indexOf(this.selectedCard)>=0){
+                    this._cardManager.cardArray.splice(this._cardManager.cardArray.indexOf(this.selectedCard),1);
                   }
                 }
 
@@ -76,8 +67,8 @@ var GameScene = cc.Scene.extend({
                     this.handleSelectedCard(target);
                   } else{
                     if(this.selectedCard){
-                      this.cardArray.push(this.selectedCard);
-                      this.setPositionOfCards(true);
+                      this._cardManager.cardArray.push(this.selectedCard);
+                      this._cardManager.setPositionOfCards();
                     }
                   }
                 this.cardSelected = false; 
@@ -101,20 +92,6 @@ var GameScene = cc.Scene.extend({
             default:break;
         }
     },
-
-    addListenersOnCards(){
-        for(let i =0;i<this.cardArray.length;i++){
-            this._eventHelper.addMouseTouchEvent(this.handleTouch.bind(this),this.cardArray[i], false);
-        }
-    },
-
-      removeListenerFromallCards(){
-        for(let i =0;i<this.cardArray.length;i++){
-            if(!this.cardArray[i].isSelected){
-                this._eventHelper.removeEventListenerFromNode(this.cardArray[i])
-            }
-        }
-      },
 
       addButton(name){
         this[name] =  new cc.Sprite("../../res/graphics/button.png");
@@ -141,7 +118,7 @@ var GameScene = cc.Scene.extend({
                     card.x = cc.winSize.width - GameConstants.CARD_WIDTH -i*GameConstants.CARD_WIDTH/4;
                     card.y -=card.height/2;
                 });
-                this.cardArray.forEach((card,i)=>{
+                this._cardManager.cardArray.forEach((card,i)=>{
                   card.x = GameConstants.CARD_WIDTH +i*GameConstants.CARD_WIDTH/4;
                 })
                 this._eventHelper.removeEventListenerFromNode(this.group);
@@ -162,14 +139,14 @@ var GameScene = cc.Scene.extend({
       },
 
       handleSelectedCard(card){
-        if(this.cardArray.indexOf(card)>=0){
+        if(this._cardManager.cardArray.indexOf(card)>=0){
           card.y +=card.height/2;
-          this.cardArray.splice(this.cardArray.indexOf(card),1);
+          this._cardManager.cardArray.splice(this._cardManager.cardArray.indexOf(card),1);
           this.selectedArray.push(card);
         } else {
           card.y -=card.height/2;
           this.selectedArray.splice(this.selectedArray.indexOf(card),1);
-          this.cardArray.push(card);
+          this._cardManager.cardArray.push(card);
         }
         if(this.selectedArray.length>0){
           this.addListenersAndMakeButtonsVisible();
@@ -198,9 +175,9 @@ var GameScene = cc.Scene.extend({
             Sound.playReset()
             let target = touch._currentTarget;
             target.setScale(1);
-            this.cardArray=this.cardArray.concat(this.selectedArray);
+            this._cardManager.cardArray=this._cardManager.cardArray.concat(this.selectedArray);
             this.selectedArray = [];
-            this.setPositionOfCards(true);
+            this._cardManager.setPositionOfCards();
             this.removeListenersAndHideButtons();
             break;
           }
@@ -216,16 +193,4 @@ var GameScene = cc.Scene.extend({
           }
         }
       },
-
-      setPositionOfCards(sort=false){
-        if(sort){
-          this.cardArray.sort(function(a,b){
-            return a.zIndex - b.zIndex})
-        }
-        this.cardArray.forEach((card,i)=>{
-          card.x = 2*GameConstants.CARD_WIDTH + i*(GameConstants.CARD_WIDTH/4) 
-          card.y = cc.winSize.height/2
-          card.zIndex = i;
-        })
-      }
 });
