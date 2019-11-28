@@ -9,6 +9,7 @@ var GameScene = cc.Scene.extend({
     _eventHelper:null,
     _cardManager:null,
     _move:false,
+    _groupButtonClicked:0,
 
 
     ctor: function (data) {
@@ -37,8 +38,8 @@ var GameScene = cc.Scene.extend({
     },
 
     handleTouch:function(event , touch ,type){
-        switch(type){
-            case EventHelperStates.ON_MOUSE_BEGAN:{
+      switch(type){
+        case EventHelperStates.ON_MOUSE_BEGAN:{
               if(!this.selectedCard && !cc.sys.isMobile){
                 let target = event.getCurrentTarget();
                 this.initialPos = target.getPosition();
@@ -58,11 +59,11 @@ var GameScene = cc.Scene.extend({
                   this._cardManager.playCardAnimation();
                 }
                 break;
-            }
-            case EventHelperStates.ON_MOUSE_END:{
-              if(!cc.sys.isMobile){
-                let target = event.getCurrentTarget();
-                  if(target.getPosition().x==this.initialPos.x){
+              }
+              case EventHelperStates.ON_MOUSE_END:{
+                if(!cc.sys.isMobile){
+                  let target = event.getCurrentTarget();
+                  if(target.getPosition().x==this.initialPos.x && this._groupButtonClicked<6){
                     Sound.playCardClick();
                     this.handleSelectedCard(target);
                   }
@@ -86,7 +87,7 @@ var GameScene = cc.Scene.extend({
               break;
             }
             case EventHelperStates.ON_CLICK:{
-              if(cc.sys.isMobile){
+              if(cc.sys.isMobile && this._groupButtonClicked<6){
                 let target = event.getCurrentTarget();
                 Sound.playCardClick();
                 this.handleSelectedCard(target);
@@ -108,40 +109,47 @@ var GameScene = cc.Scene.extend({
     handleGroupButtonClick:function(touch ,event ,type){
       switch(type){
         case EventHelperStates.ON_CLICK:{
-          Sound.playGroup();
-          if(this._cardManager.selectedArray.length){
-            let target = touch._currentTarget;
-            target.setScale(1);
-              this._cardManager.selectedArray.forEach((card,i) => {
-                  card.stopAllActions();
-                  this._eventHelper.removeEventListenerFromNode(card);
-                  card.x = cc.winSize.width - GameConstants.CARD_WIDTH -i*GameConstants.CARD_WIDTH/4;
-                  card.y =cc.winSize.height/2;
-              });
-              this._cardManager.setPositionOfCards();
-              this._eventHelper.removeEventListenerFromNode(this.group);
+              this._groupButtonClicked++;
+              Sound.playGroup();
+              if(this._cardManager.selectedArray.length){
+                let target = touch._currentTarget;
+                target.setScale(1);
+                  this._cardManager.selectedArray.forEach((card,i) => {
+                      card.stopAllActions();
+                      this._eventHelper.removeEventListenerFromNode(card);
+                      card.x = this._groupButtonClicked<=3 ? 
+                      cc.winSize.width - GameConstants.CARD_WIDTH -i*GameConstants.CARD_WIDTH/4:
+                      GameConstants.CARD_WIDTH/2 +i*GameConstants.CARD_WIDTH/4;
+                      card.y =cc.winSize.height- GameConstants.CARD_HEIGHT/2 -((this._groupButtonClicked%3))*cc.winSize.height/4;
+                  });
+                  this._cardManager._allTimeSelectedArray =this._cardManager._allTimeSelectedArray.concat(this._cardManager.selectedArray);
+                  this._cardManager.selectedArray = [];
+                  this._cardManager.setPositionOfCards();
+                  this._eventHelper.removeEventListenerFromNode(this.group);
           }
           break;
         }
         case EventHelperStates.ON_MOUSE_OVER:{
-          let target = touch._currentTarget;
-          target.setScale(1.1);
+            let target = touch._currentTarget;
+            target.setScale(1.1);
           break;
         }
         case EventHelperStates.ON_MOUSE_OUT:{
-          let target = touch._currentTarget;
-          target.setScale(1);
+            let target = touch._currentTarget;
+            target.setScale(1);
           break;
         }
+        default:break;
       }
     },
 
     handleSelectedCard:function (card){
       if(this._cardManager.cardArray.indexOf(card)>=0){
         card.y +=card.height/2;
+        debugger
         this._cardManager.cardArray.splice(this._cardManager.cardArray.indexOf(card),1);
         this._cardManager.selectedArray.push(card);
-      } else {
+      } else if(this._cardManager.selectedArray.indexOf(card)>=0){
         card.stopAllActions();
         card.y =cc.winSize.height/2;
         this._cardManager.selectedArray.splice(this._cardManager.selectedArray.indexOf(card),1);
@@ -152,6 +160,7 @@ var GameScene = cc.Scene.extend({
       } else{
         this.removeListenersAndHideButtons();
       }
+      console.log(this._cardManager.selectedArray,this._cardManager.cardArray);
       this._cardManager.playSelectedCardAnimation();
     },
 
@@ -172,6 +181,7 @@ var GameScene = cc.Scene.extend({
     handleResetButtonClick:function(touch, event, type){
       switch(type){
         case EventHelperStates.ON_CLICK:{
+          this._groupButtonClicked = 0;
           Sound.playReset()
           let target = touch._currentTarget;
           target.setScale(1);

@@ -20,7 +20,6 @@ var CardManager = cc.Class.extend({
             this._cardContainer.addChild(cardMc,i);
             this.cardArray.push(cardMc,);
         }
-        return this.cardArray;
     },
 
     addListenersOnCards:function(){
@@ -68,11 +67,12 @@ var CardManager = cc.Class.extend({
     },
 
     reset:function(){
-        this.selectedArray.forEach((card)=>{
-            this._eventHelper.addMouseTouchEvent(this._cardContainer.handleTouch.bind(this._cardContainer),card, cc.sys.isMobile?true:false);
-        })
+        this.cardArray = this.cardArray.concat(this._allTimeSelectedArray);
         this.cardArray = this.cardArray.concat(this.selectedArray);
+        this.removeListenerFromAllCards();
+        this.addListenersOnCards();
         this.selectedArray = [];
+        this._allTimeSelectedArray = [];
         this.setPositionOfCards(true);
     }
 })
