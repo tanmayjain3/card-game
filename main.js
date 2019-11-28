@@ -114,13 +114,11 @@ cc.game.onStart = function(){
 		},
 
 		loadGame:function(){
-			cc.loader.loadJs(["src/jsList.js"], function(){
-				cc.loader.loadJs(jsList, function(){
-					cc.loader.loadJson(["./cardsInfo.json"],function(error,data){
-						Game.start(data);
-					})
-				});
-			});
+			cc.LoaderScene.preload(resources, function () {
+				cc.loader.loadJson(["./cardsInfo.json"],function(error,data){
+					Game.start(data);
+				})
+			}, this);
 		},
 
 		updateProgress:function(dt){

@@ -53,4 +53,5 @@ var resources = [
     "res/graphics/cards/cardHeartsK.png",
     "res/graphics/cards/cardHeartsQ.png",
     "res/graphics/button.png",
+    "res/graphics/background.png",
 ];

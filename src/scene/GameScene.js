@@ -20,6 +20,7 @@ var GameScene = cc.Scene.extend({
         this.selectedArray = [];
         this.cardSelected = false;
         this._ui = new GameSceneUI();
+        this.addBackGround();
         this._eventHelper = new EventHelper();
         this.addChild(this._ui);
                 let cards = data.value.cards;
@@ -35,6 +36,13 @@ var GameScene = cc.Scene.extend({
                 this.setPositionOfCards();
                 this.addListenersOnCards();
         return true;
+    },
+
+    addBackGround:function(){
+        let background = new cc.Sprite("../../res/graphics/background.png");
+        background.setPosition(cc.winSize.width/2, cc.winSize.height/2);
+        background.setAnchorPoint(0.5,0.5);
+        this._ui.addChild(background);
     },
 
     handleTouch:function(event , touch ,type){
