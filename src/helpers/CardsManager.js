@@ -1,16 +1,14 @@
 var CardManager = cc.Class.extend({
 
     _cardContainer:null,
-    cardArray:null,
+    cardArray:[],
     _eventHelper:null,
-    selectedArray:null,
-    _animationStarted:null,
+    selectedArray:[],
+    _animationStarted:false,
+    _allTimeSelectedArray:[],
 
     ctor:function(gamescene){
-        this.cardArray = [];
-        this.selectedArray = [];
         this._cardContainer =gamescene;
-        this._animationStarted = false;
         this._eventHelper = new EventHelper();
     },
 
