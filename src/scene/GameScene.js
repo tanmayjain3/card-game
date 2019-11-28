@@ -112,7 +112,8 @@ var GameScene = cc.Scene.extend({
             let target = touch._currentTarget;
             target.setScale(1);
               this._cardManager.selectedArray.forEach((card,i) => {
-                card.stopAllActions();
+                  card.stopAllActions();
+                  this._eventHelper.removeEventListenerFromNode(card);
                   card.x = cc.winSize.width - GameConstants.CARD_WIDTH -i*GameConstants.CARD_WIDTH/4;
                   card.y =cc.winSize.height/2;
               });

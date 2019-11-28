@@ -70,8 +70,11 @@ var CardManager = cc.Class.extend({
     },
 
     reset:function(){
+        this.selectedArray.forEach((card)=>{
+            this._eventHelper.addMouseTouchEvent(this._cardContainer.handleTouch.bind(this._cardContainer),card, cc.sys.isMobile?true:false);
+        })
         this.cardArray = this.cardArray.concat(this.selectedArray);
         this.selectedArray = [];
-        this.setPositionOfCards();
+        this.setPositionOfCards(true);
     }
 })
