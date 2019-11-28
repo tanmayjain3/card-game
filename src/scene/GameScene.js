@@ -9,6 +9,8 @@ var GameScene = cc.Scene.extend({
     _eventHelper:null,
     _cardManager:null,
     _move:false,
+    allSelectedCards:[],
+    groupButtonClicked:0,
 
 
     ctor: function (data) {
@@ -62,7 +64,7 @@ var GameScene = cc.Scene.extend({
             case EventHelperStates.ON_MOUSE_END:{
               if(!cc.sys.isMobile){
                 let target = event.getCurrentTarget();
-                  if(target.getPosition().x==this.initialPos.x){
+                  if(target.getPosition().x==this.initialPos.x && this.groupButtonClicked<6){
                     Sound.playCardClick();
                     this.handleSelectedCard(target);
                   } else{
@@ -88,7 +90,7 @@ var GameScene = cc.Scene.extend({
               break;
             }
             case EventHelperStates.ON_CLICK:{
-              if(cc.sys.isMobile && this._move){
+              if(cc.sys.isMobile && this._move && this.groupButtonClicked<6){
                 let target = event.getCurrentTarget();
                 Sound.playCardClick();
                 this.handleSelectedCard(target);
@@ -110,6 +112,7 @@ var GameScene = cc.Scene.extend({
     handleGroupButtonClick:function(touch ,event ,type){
       switch(type){
         case EventHelperStates.ON_CLICK:{
+          this.groupButtonClicked++;
           Sound.playGroup();
           if(this._cardManager.selectedArray.length){
             let target = touch._currentTarget;
@@ -117,9 +120,13 @@ var GameScene = cc.Scene.extend({
               this._cardManager.selectedArray.forEach((card,i) => {
                   card.stopAllActions();
                   this._eventHelper.removeEventListenerFromNode(card);
-                  card.x = cc.winSize.width - GameConstants.CARD_WIDTH -i*GameConstants.CARD_WIDTH/4;
-                  card.y =cc.winSize.height/2;
+                  card.x = this.groupButtonClicked<=3 ? 
+                  cc.winSize.width - GameConstants.CARD_WIDTH -i*GameConstants.CARD_WIDTH/4:
+                  GameConstants.CARD_WIDTH/2 +i*GameConstants.CARD_WIDTH/4;
+                  card.y =cc.winSize.height- GameConstants.CARD_HEIGHT/2 -((this.groupButtonClicked%3))*cc.winSize.height/4;
               });
+              this.allSelectedCards = this.allSelectedCards.concat(this._cardManager.selectedArray);
+              this._cardManager.selectedArray = [];
               this._cardManager.setPositionOfCards();
               this._eventHelper.removeEventListenerFromNode(this.group);
           }
@@ -174,10 +181,14 @@ var GameScene = cc.Scene.extend({
     handleResetButtonClick:function(touch, event, type){
       switch(type){
         case EventHelperStates.ON_CLICK:{
+          this.groupButtonClicked = 0;
           Sound.playReset()
           let target = touch._currentTarget;
           target.setScale(1);
+          this.allSelectedCards = this.allSelectedCards.concat(this._cardManager.selectedArray);
+          this._cardManager.selectedArray = [];
           this._cardManager.reset();
+          this.allSelectedCards = [];
           this.removeListenersAndHideButtons();
           break;
         }
