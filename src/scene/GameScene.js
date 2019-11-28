@@ -78,7 +78,7 @@ var GameScene = cc.Scene.extend({
           }
             case EventHelperStates.ON_MOUSE_OVER:{
               let target = event._currentTarget;
-              if(target && this.selectedCard){
+              if(target && this.selectedCard && this._move){
                 if(this.delatX<0){
                   this.selectedCard.zIndex = target.zIndex==0?target.zIndex-1:target.zIndex +1;
                 } else{
