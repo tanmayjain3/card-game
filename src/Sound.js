@@ -6,6 +6,7 @@ var Sound = {
     playGameBgMusic:function(){
         if(!Sound.silence)
             cc.audioEngine.playMusic("res/sounds/bgGame.mp3", true);
+            cc.audioEngine.setMusicVolume(0.1);
     },
  
     playGroup:function(){
@@ -19,5 +20,9 @@ var Sound = {
     playCardClick:function(){
         if(!Sound.silence)
             cc.audioEngine.playEffect("res/sounds/cardClick.mp3", false);
+    },
+    playCardMove:function(){
+        if(!Sound.silence)
+            cc.audioEngine.playEffect("res/sounds/cardMove.mp3", false);
     }
 };
