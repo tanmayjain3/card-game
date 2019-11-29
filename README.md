@@ -9,11 +9,23 @@ Engine Version: cocos2d-jd 3.0 rc2
 * Reads json file for card information
 * Displays cards on canvas.
 * You can drag card anywhere.
-* When card is passed over another card it swaps it's position
+* When card is passed over another card it swaps its position
 * You can select multiple cards and make groups of them.
 
 ## Build
 
 * Clone the project to your local machine
+
+```
+git clone https://github.com/tanmayjain3/card-game.git
+```
 * Go to the project directory
-* Open terminal and run command "python -m SimpleHTTPServer"
+
+```
+cd card-game
+```
+* Run command 
+
+```
+python -m SimpleHTTPServer
+```
