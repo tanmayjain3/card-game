@@ -22,7 +22,7 @@ const ICardNumber = {
 }
 
 var Card = cc.Sprite.extend({
-
+    // Creating cards according to json data
     ctor: function (cardName) {
         let cardType = cardName.substr(cardName.length-1,cardName.length);
         let cardNumber = cardName.substr(0,cardName.length-1);

@@ -11,6 +11,7 @@ var CardManager = cc.Class.extend({
         this._eventHelper = new EventHelper();
     },
 
+    // Adding cards on screen 
     init:function(cards){
         for(let i=0;i<cards.length;i++){
             var cardMc = new Card(cards[i])
@@ -22,6 +23,7 @@ var CardManager = cc.Class.extend({
         return this.cardArray;
     },
 
+    // adding and removing listeners on cards
     addListenersOnCards:function(){
         for(let i =0;i<this.cardArray.length;i++){
             this._eventHelper.addMouseTouchEvent(this._cardContainer.handleTouch.bind(this._cardContainer),this.cardArray[i], cc.sys.isMobile?true:false);
@@ -34,7 +36,7 @@ var CardManager = cc.Class.extend({
         }
       },
 
-
+      // Setting position of cards on screen
     setPositionOfCards(setZIndex=false){
         this._animationStarted = false;
         this.cardArray.sort(function(a,b){
@@ -49,6 +51,7 @@ var CardManager = cc.Class.extend({
       })
     },
 
+    // Card animations
     playSelectedCardAnimation:function(){
         if(this.selectedArray.length){
             this.selectedArray.forEach((card)=>{
@@ -66,6 +69,7 @@ var CardManager = cc.Class.extend({
         }
     },
 
+    // Handling reset screen after grouping of cards
     reset:function(){
         this.cardArray = this.cardArray.concat(this._cardContainer.allSelectedCards);
         this.removeListenerFromAllCards();

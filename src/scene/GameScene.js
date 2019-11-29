@@ -31,12 +31,15 @@ var GameScene = cc.Scene.extend({
       this._cardManager.addListenersOnCards();
     },
 
+    // Added background on screen
     addBackground:function(){
         let background = new cc.Sprite(GameConstants.BACKGROUND_PATH);
         background.setPosition(cc.winSize.width/2, cc.winSize.height/2);
         background.setAnchorPoint(0.5,0.5);
         this.addChild(background,-2);
     },
+
+    // Handling touch and click events on cards
 
     handleTouch:function(event , touch ,type){
         switch(type){
@@ -102,6 +105,7 @@ var GameScene = cc.Scene.extend({
         }
     },
 
+    // Added group button and reset button screen
     addButton:function(name){
       this[name] =  new Button(GameConstants.BUTTON_PATH,name);
       this[name].setPosition(name==GameConstants.GROUP?
@@ -110,6 +114,7 @@ var GameScene = cc.Scene.extend({
       this[name].visible = false;
     },
 
+    // handling group button click
     handleGroupButtonClick:function(touch ,event ,type){
       switch(type){
         case EventHelperStates.ON_CLICK:{
@@ -146,6 +151,7 @@ var GameScene = cc.Scene.extend({
       }
     },
 
+    // Handling single card selection
     handleSelectedCard:function (card){
       if(this._cardManager.cardArray.indexOf(card)>=0){
         card.y +=card.height/2;
@@ -165,6 +171,8 @@ var GameScene = cc.Scene.extend({
       this._cardManager.playSelectedCardAnimation();
     },
 
+
+    //  Adding and removing listeners on reset and group button
     addListenersAndMakeButtonsVisible:function(){
       this.reset.visible = true;
       this.group.visible = true;
@@ -179,6 +187,7 @@ var GameScene = cc.Scene.extend({
       this._eventHelper.removeEventListenerFromNode(this.group);        
     },
 
+    // Reset button click handling 
     handleResetButtonClick:function(touch, event, type){
       switch(type){
         case EventHelperStates.ON_CLICK:{

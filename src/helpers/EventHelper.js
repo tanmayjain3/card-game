@@ -16,7 +16,7 @@ const EventHelperStates = {
     lastMousePos: null,
 }
 
-
+// Added mouseTouch listener on nodes and handled different conditions
 var EventHelper = cc.Class.extend({
 
     ctor:function(){
